@@ -9,6 +9,7 @@ class Question(db.Model):
     options = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=False)  # Тематика вопроса
 
+
 class UserAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)

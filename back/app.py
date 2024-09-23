@@ -1,18 +1,15 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
+from back.models import db  # Импортируем db, чтобы инициализировать его
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object('config.Config')
 
-db = SQLAlchemy(app)
+# Импортируем маршруты после создания приложения
+from back.routes import *
 
-from routes import *
 @app.route('/')
 def home():
     return "Hello, this is the Quiz app!"
-
 
 if __name__ == '__main__':
     app.run(debug=True)

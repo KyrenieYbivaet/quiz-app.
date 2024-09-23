@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App API</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #1e1e2f; /* Темный фон */
+            color: #ffffff; /* Белый текст */
+        }
+        .card {
+            background-color: #2a2a3c; /* Темная карточка */
+            border: none;
+        }
+        .light-theme {
+            background-color: #f9f9f9; /* Светлый фон */
+            color: #333; /* Темный текст */
+        }
+        .light-theme .card {
+            background-color: #ffffff; /* Светлая карточка */
+        }
+        .btn-link {
+            color: #007bff; /* Цвет ссылки */
+        }
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Добро пожаловать в Quiz App API</h1>
+        <button id="themeToggle" class="btn btn-secondary mb-3">Сменить тему</button>
+        <p>Этот API позволяет вам взаимодействовать с приложением викторины.</p>
+
+        <div class="accordion" id="apiAccordion">
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            1. Получить вопросы
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#apiAccordion">
+                    <div class="card-body">
+                        <p>Запрос: <code>GET /api/questions</code></p>
+                        <p>Описание: Получает список вопросов викторины.</p>
+                        <p>Пример использования:</p>
+                        <pre><code>fetch('/api/questions').then(res => res.json()).then(data => console.log(data));</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="headingTwo">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            2. Отправить ответы
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#apiAccordion">
+                    <div class="card-body">
+                        <p>Запрос: <code>POST /api/submit-answers</code></p>
+                        <p>Описание: Отправляет ответы пользователя на вопросы и возвращает результат.</p>
+                        <p>Пример использования:</p>
+                        <pre><code>
+fetch('/api/submit-answers', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        user_id: 1,
+        answers: [
+            {"question_id": 1, "answer": "Python"},
+            {"question_id": 2, "answer": "Java"}
+        ]
+    })
+}).then(res => res.json()).then(data => console.log(data));
+                        </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.contains('light-theme');
+            themeToggle.textContent = isLightTheme ? 'Сменить на темную тему' : 'Сменить на светлую тему';
+        });
+    </script>
+</body>
+</html>

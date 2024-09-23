@@ -1,0 +1,19 @@
+from back.app import db
+
+class Question(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(500), nullable=False)
+    correct_answer = db.Column(db.String(100), nullable=False)
+    options = db.Column(db.String(500), nullable=False)  # Список вариантов через запятую
+
+class UserAnswer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    user_answer = db.Column(db.String(100), nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+class TestResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    total_questions = db.Column(db.Integer, nullable=False)

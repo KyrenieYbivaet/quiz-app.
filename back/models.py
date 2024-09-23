@@ -7,8 +7,7 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(500), nullable=False)
     correct_answer = db.Column(db.String(100), nullable=False)
-    options = db.Column(db.String(500), nullable=False)  # Список вариантов через запятую
-
+    options = db.Column(db.String(500), nullable=False)  
 
 class UserAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

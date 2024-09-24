@@ -89,3 +89,41 @@ def get_questions(category):
     if isinstance(question, dict) and 'error' in question:
         return jsonify(question), 500  # Ошибка при получении вопросов
     return jsonify(question)
+
+
+def get_question(category):
+    category_ids = {
+        "history": 23,
+        "science": 17,
+        "sports": 21,
+        "geography": 22,
+        "math": 19,
+        "general": 9
+    }
+
+    if category == "any":
+        category = random.choice(list(category_ids.keys()))
+
+    # Проверяем, есть ли вопрос в БД по данной категории
+    existing_question = Question.query.filter_by(category=category).order_by(db.func.random()).first()
+
+    if existing_question:
+        return existing_question
+
+    # Если вопроса нет, создаем его
+    return get_questions_by_category(category)
+
+
+@quiz_bp.route('/api/get_random_question/<category>', methods=['GET'])
+def get_random_question(category):
+    question = get_question(category)
+
+    if isinstance(question, dict) and 'error' in question:
+        return jsonify(question), 500  # Ошибка при получении вопроса
+
+    return jsonify({
+        "category": question.category,
+        "correct_answer": question.correct_answer,
+        "options": question.options.split(','),
+        "text": question.text
+    })

@@ -11,13 +11,18 @@ class User(db.Model):
 
 
 class UserStatistics(db.Model):
-    __tablename__ = 'UserStatistics'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    category = db.Column(db.String(100), nullable=False)
-    correct_answers = db.Column(db.Integer, default=0)
-    incorrect_answers = db.Column(db.Integer, default=0)
+    correct_answers_sports = db.Column(db.Integer, default=0)
+    incorrect_answers_sports = db.Column(db.Integer, default=0)
+    correct_answers_history = db.Column(db.Integer, default=0)
+    incorrect_answers_history = db.Column(db.Integer, default=0)
+    correct_answers_science = db.Column(db.Integer, default=0)
+    incorrect_answers_science = db.Column(db.Integer, default=0)
+    correct_answers_geography = db.Column(db.Integer, default=0)
+    incorrect_answers_geography = db.Column(db.Integer, default=0)
+    correct_answers_math = db.Column(db.Integer, default=0)
+    incorrect_answers_math = db.Column(db.Integer, default=0)
 
 
 class Question(db.Model):

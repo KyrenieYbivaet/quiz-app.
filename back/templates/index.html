@@ -26,24 +26,34 @@
             }
         }
 
-        async function getUserStatistics() {
-            const userId = document.getElementById('user_id').value;
-
-            const response = await fetch(`/api/user_statistics/${userId}`);
-            if (response.ok) {
+        const getUserStatistics = async () => {
+            try {
+                const response = await fetch('/api/user_statistics/1');
                 const statistics = await response.json();
-                const statsDiv = document.getElementById('user_statistics');
-                statsDiv.innerHTML = ''; // Очистить предыдущие результаты
 
-                statistics.forEach(stat => {
-                    const statItem = document.createElement('div');
-                    statItem.textContent = `Тематика: ${stat.category}, Правильные: ${stat.correct_answers}, Неправильные: ${stat.incorrect_answers}`;
-                    statsDiv.appendChild(statItem);
-                });
-            } else {
-                alert('Ошибка при получении статистики');
+
+                // Проверяем, является ли statistics объектом
+                if (typeof statistics === 'object' && !Array.isArray(statistics)) {
+                    // Выводим статистику на экран
+                    const userStatisticsDiv = document.getElementById('user_statistics');
+                    userStatisticsDiv.innerHTML = `<h3>Статистика пользователя (ID: ${statistics.user_id})</h3>`;
+                    userStatisticsDiv.innerHTML += '<h4>Правильные ответы:</h4>';
+                    Object.keys(statistics.correct_answers).forEach(category => {
+                        userStatisticsDiv.innerHTML += `${category}: ${statistics.correct_answers[category]}<br>`;
+                    });
+                    userStatisticsDiv.innerHTML += '<h4>Неправильные ответы:</h4>';
+                    Object.keys(statistics.incorrect_answers).forEach(category => {
+                        userStatisticsDiv.innerHTML += `${category}: ${statistics.incorrect_answers[category]}<br>`;
+                    });
+                } else {
+                    console.error('Полученные данные не являются объектом:', statistics);
+                }
+            } catch (error) {
+                console.error('Ошибка при получении статистики:', error);
             }
-        }
+        };
+
+
 
         async function submitAnswer() {
             const userId = document.getElementById('submit_user_id').value;
@@ -104,8 +114,9 @@
             <h2>Статистика пользователя</h2>
             <input type="number" id="user_id" placeholder="Введите ID пользователя" required>
             <button onclick="getUserStatistics()">Получить статистику</button>
-            <div id="user_statistics"></div>
+            <div id="user_statistics"></div> <!-- Этот элемент используется для отображения статистики -->
         </div>
+
 
         <div class="submit-answer">
             <h2>Отправить ответ</h2>

@@ -1,0 +1,54 @@
+body {
+    background-color: #121212;
+    color: #ffffff; /* Белый текст */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #ff5722; /* Оранжевый цвет для заголовка */
+}
+
+.instructions {
+    margin-bottom: 20px;
+}
+
+.columns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.column {
+    width: 45%; /* Ширина каждого столбца */
+}
+
+button {
+    background-color: #ff5722; /* Оранжевый фон для кнопок */
+    color: #ffffff; /* Белый текст на кнопках */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    width: 100%; /* Кнопки занимают всю ширину столбца */
+}
+
+button:hover {
+    background-color: #e64a19; /* Более темный оранжевый при наведении */
+}
+
+footer {
+    margin-top: 20px;
+    color: #aaaaaa; /* Серый цвет для всех прав */
+}

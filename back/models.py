@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)
@@ -15,6 +16,7 @@ class UserAnswer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     user_answer = db.Column(db.String(100), nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False)
+
 
 class TestResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)

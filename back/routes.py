@@ -3,6 +3,7 @@ from .models import db, Question
 from .translate import translate_text
 import requests
 from urllib.parse import unquote
+import random
 
 # Создаем Blueprint
 quiz_bp = Blueprint('quiz', __name__)
@@ -22,42 +23,49 @@ def get_session_token():
             raise Exception("Не удалось получить токен")
 
 
-# Функция для получения вопросов по тематике
-def get_questions_by_category(category):
+def create_question(category):
     global session_token
-    get_session_token()  # Убедитесь, что токен получен
+    get_session_token()
 
     category_ids = {
         "history": 23,
         "science": 17,
         "sports": 21,
         "geography": 22,
-        "math": 19,
-        "general": 9  # Добавляем категорию "General Knowledge"
+        "math": 19
     }
+
+    if category == "any":
+        category = random.choice(list(category_ids.keys()))
 
     category_id = category_ids.get(category)
     if category_id is None:
-        return {"error": "Invalid category"}
+        return {"error": "Неверная категория"}
 
     trivia_url = f"https://opentdb.com/api.php?amount=1&category={category_id}&difficulty=easy&type=multiple&token={session_token}&encode=url3986"
     response = requests.get(trivia_url)
 
     if response.status_code != 200:
-        return {"error": "Failed to fetch questions"}
+        return {"error": "Не удалось получить вопросы, статус: " + str(response.status_code)}
 
     questions_data = response.json()
-
+    """
+Code 0: Success Returned results successfully.
+Code 1: No Results Could not return results. The API doesn't have enough questions for your query. 
+Code 2: Invalid Parameter Contains an invalid parameter. Arguements passed in aren't valid. (Ex. Amount = Five)
+Code 3: Token Not Found Session Token does not exist.
+Code 4: Token Empty Session Token has returned all possible questions for the specified query. Resetting the Token is necessary.
+Code 5: Rate Limit Too many requests have occurred. Each IP can only access the API once every 5 seconds.
+   """
     if questions_data['response_code'] != 0:
         if questions_data['response_code'] == 4:
             session_token = None
-            return get_questions_by_category(category)
+            return create_question(category)
         else:
-            return {"error": "Failed to fetch questions: " + str(questions_data['response_code'])}
+            return {"error": "Не удалось получить вопросы: " + str(questions_data['response_code'])}
 
     # Обрабатываем только один вопрос
     item = questions_data['results'][0]
-    # Декодируем вопрос и ответы
     decoded_question = unquote(item['question'])
     decoded_correct_answer = unquote(item['correct_answer'])
     decoded_options = [unquote(answer) for answer in item['incorrect_answers'] + [item['correct_answer']]]
@@ -65,12 +73,14 @@ def get_questions_by_category(category):
     translated_question = translate_text(decoded_question)
     correct_answer = translate_text(decoded_correct_answer)
     options = [translate_text(answer) for answer in decoded_options]
+
     question = Question(
         text=translated_question,
         correct_answer=correct_answer,
         options=",".join(options),
         category=category
     )
+
     db.session.add(question)
     db.session.commit()
 
@@ -82,12 +92,12 @@ def get_questions_by_category(category):
     }
 
 
-@quiz_bp.route('/api/questions/<category>', methods=['GET'])
+@quiz_bp.route('/api/new_question/<category>', methods=['GET'])
 def get_questions(category):
-    question = get_questions_by_category(category)
+    question = create_question(category)
 
     if isinstance(question, dict) and 'error' in question:
-        return jsonify(question), 500  # Ошибка при получении вопросов
+        return jsonify(question), 500
     return jsonify(question)
 
 
@@ -104,22 +114,19 @@ def get_question(category):
     if category == "any":
         category = random.choice(list(category_ids.keys()))
 
-    # Проверяем, есть ли вопрос в БД по данной категории
     existing_question = Question.query.filter_by(category=category).order_by(db.func.random()).first()
 
     if existing_question:
         return existing_question
-
-    # Если вопроса нет, создаем его
-    return get_questions_by_category(category)
+    return create_question(category)  # Если вопроса нет, создаем его
 
 
-@quiz_bp.route('/api/get_random_question/<category>', methods=['GET'])
+@quiz_bp.route('/api/get_question/<category>', methods=['GET'])
 def get_random_question(category):
     question = get_question(category)
 
     if isinstance(question, dict) and 'error' in question:
-        return jsonify(question), 500  # Ошибка при получении вопроса
+        return jsonify(question), 500
 
     return jsonify({
         "category": question.category,

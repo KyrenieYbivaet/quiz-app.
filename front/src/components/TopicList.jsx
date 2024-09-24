@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import Quiz from './Quiz'
 
-const topics = ['История', 'Математика', 'Наука', 'География', 'Спорт']
+const topics = ['history', 'math', 'science', 'geography', 'sports']
 
 const TopicContainer = styled.div`
     padding: 20px;
@@ -64,21 +64,23 @@ const TopicList = () => {
     }
 
     if (isQuizStarted) {
-        return <Quiz onBack={handleBackClick} />
+        return (
+            <Quiz onBack={handleBackClick} selectedCategory={selectedTopic} />
+        ) // Added semicolon here
     }
 
     return (
         <TopicContainer>
-            <h2>Выберите тему</h2>
+            <h2>Select a Topic</h2>
             {selectedTopic ? (
                 <>
                     <Topic>{selectedTopic}</Topic>
                     <div>
                         <BackButton onClick={handleBackClick}>
-                            Назад к тематикам
+                            Back to Topics
                         </BackButton>
                         <StartButton onClick={handleStartTest}>
-                            Начать выполнение теста
+                            Start Test
                         </StartButton>
                     </div>
                 </>

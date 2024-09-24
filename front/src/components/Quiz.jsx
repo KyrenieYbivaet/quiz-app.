@@ -6,21 +6,19 @@ const QuizContainer = styled.div`
     text-align: center;
 `
 
-const Question = styled.h2`
-    margin-bottom: 20px;
+const Question = styled.h3`
+    margin: 20px 0;
 `
 
 const AnswerButton = styled.button`
-    display: block;
-    margin: 10px auto;
+    margin: 10px;
     padding: 10px 20px;
     background-color: #f0f0f0;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-
     &:hover {
-        background-color: #e0e0e0;
+        background-color: #d3d3d3;
     }
 `
 
@@ -32,13 +30,12 @@ const NextButton = styled.button`
     border: none;
     border-radius: 5px;
     cursor: pointer;
-
     &:hover {
         background-color: #0056b3;
     }
 `
 
-const Quiz = ({ onBack }) => {
+const Quiz = ({ onBack, selectedCategory }) => {
     const [questions, setQuestions] = useState([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -46,12 +43,34 @@ const Quiz = ({ onBack }) => {
     const [isQuizCompleted, setIsQuizCompleted] = useState(false)
 
     useEffect(() => {
-        fetch('/questions.json')
-            .then(response => response.json())
-            .then(data => {
-                setQuestions(data)
-            })
-    }, [])
+        if (!selectedCategory) {
+            console.error('Category not selected')
+            return
+        }
+
+        const fetchQuestions = async () => {
+            try {
+                const response = await fetch(
+                    `http://127.0.0.1:5000/api/new_question/${selectedCategory}`
+                )
+                const data = await response.json()
+
+                const formattedQuestions = [
+                    {
+                        question: data.text,
+                        correctAnswer: data.correct_answer,
+                        answers: data.options,
+                    },
+                ]
+
+                setQuestions(formattedQuestions)
+            } catch (error) {
+                console.error('Error loading questions:', error)
+            }
+        }
+
+        fetchQuestions()
+    }, [selectedCategory])
 
     const handleAnswerClick = answer => {
         setSelectedAnswer(answer)
@@ -74,17 +93,17 @@ const Quiz = ({ onBack }) => {
     }
 
     if (questions.length === 0) {
-        return <p>Загрузка вопросов...</p>
+        return <p>Loading questions...</p>
     }
 
     if (isQuizCompleted) {
         return (
             <QuizContainer>
-                <h2>Викторина завершена!</h2>
+                <h2>Quiz Completed!</h2>
                 <p>
-                    Ваш результат: {score} из {questions.length}
+                    Your score: {score} out of {questions.length}
                 </p>
-                <NextButton onClick={onBack}>Назад к тематикам</NextButton>
+                <NextButton onClick={onBack}>Back to Topics</NextButton>
             </QuizContainer>
         )
     }
@@ -109,8 +128,8 @@ const Quiz = ({ onBack }) => {
             {selectedAnswer && (
                 <NextButton onClick={handleNextQuestion}>
                     {currentQuestionIndex + 1 === questions.length
-                        ? 'Завершить'
-                        : 'Следующий вопрос'}
+                        ? 'Finish'
+                        : 'Next Question'}
                 </NextButton>
             )}
         </QuizContainer>

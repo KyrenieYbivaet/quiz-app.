@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from .models import db, Question
+from .models import db, Question, User, UserStatistics  # Обновлено для импорта User
 from .translate import translate_text
 import requests
 from urllib.parse import unquote
@@ -49,14 +49,6 @@ def create_question(category):
         return {"error": "Не удалось получить вопросы, статус: " + str(response.status_code)}
 
     questions_data = response.json()
-    """
-Code 0: Success Returned results successfully.
-Code 1: No Results Could not return results. The API doesn't have enough questions for your query. 
-Code 2: Invalid Parameter Contains an invalid parameter. Arguements passed in aren't valid. (Ex. Amount = Five)
-Code 3: Token Not Found Session Token does not exist.
-Code 4: Token Empty Session Token has returned all possible questions for the specified query. Resetting the Token is necessary.
-Code 5: Rate Limit Too many requests have occurred. Each IP can only access the API once every 5 seconds.
-   """
     if questions_data['response_code'] != 0:
         if questions_data['response_code'] == 4:
             session_token = None
@@ -134,3 +126,86 @@ def get_random_question(category):
         "options": question.options.split(','),
         "text": question.text
     })
+
+
+def update_user_statistics(user_id, category, is_correct):
+    # Проверяем, существует ли пользователь
+    user = User.query.get(user_id)
+    if user is None:
+        raise Exception("Пользователь не найден")
+
+    # Проверяем, существует ли запись для данного пользователя и категории
+    stats = UserStatistics.query.filter_by(user_id=user_id, category=category).first()
+
+    if stats is None:
+        # Если записи нет, не создаем новую
+        return  # Или можете вернуть ошибку, если хотите
+
+    # Обновляем статистику
+    if is_correct:
+        stats.correct_answers += 1
+    else:
+        stats.incorrect_answers += 1
+
+    db.session.commit()
+
+
+
+@quiz_bp.route('/api/submit_answer', methods=['POST'])
+def submit_answer():
+    data = request.json
+    user_id = data['user_id']
+    question_id = data['question_id']
+    user_answer = data['user_answer']
+
+    # Проверяем существование пользователя
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "Пользователь не найден"}), 404
+
+    # Проверяем существование вопроса
+    question = Question.query.get(question_id)
+    if question is None:
+        return jsonify({"error": "Вопрос не найден"}), 404
+
+    # Проверяем, правильный ли ответ
+    is_correct = user_answer == question.correct_answer
+
+    # Обновляем статистику, если запись существует
+    try:
+        update_user_statistics(user_id, question.category, is_correct)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"correct": is_correct})
+
+
+
+@quiz_bp.route('/api/register_user', methods=['POST'])
+def register_user():
+    data = request.json
+    nickname = data['nickname']
+
+    if User.query.filter_by(nickname=nickname).first() is not None:
+        return jsonify({"error": "Пользователь с таким ником уже существует."}), 400
+
+    new_user = User(nickname=nickname)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"id": new_user.id, "nickname": new_user.nickname})
+
+
+@quiz_bp.route('/api/user_statistics/<int:user_id>', methods=['GET'])
+def get_user_statistics(user_id):
+    statistics = UserStatistics.query.filter_by(user_id=user_id).all()
+    result = []
+
+    for stat in statistics:
+        result.append({
+            "category": stat.category,
+            "correct_answers": stat.correct_answers,
+            "incorrect_answers": stat.incorrect_answers
+        })
+
+    return jsonify(result)

@@ -5,6 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Quiz App</title>
+    <script>
+        async function registerUser() {
+            const nickname = document.getElementById('nickname').value;
+
+            const response = await fetch('/api/register_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nickname })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(`Пользователь зарегистрирован! ID: ${data.id}, Ник: ${data.nickname}`);
+            } else {
+                const error = await response.json();
+                alert(`Ошибка: ${error.error}`);
+            }
+        }
+
+        async function getUserStatistics() {
+            const userId = document.getElementById('user_id').value;
+
+            const response = await fetch(`/api/user_statistics/${userId}`);
+            if (response.ok) {
+                const statistics = await response.json();
+                const statsDiv = document.getElementById('user_statistics');
+                statsDiv.innerHTML = ''; // Очистить предыдущие результаты
+
+                statistics.forEach(stat => {
+                    const statItem = document.createElement('div');
+                    statItem.textContent = `Тематика: ${stat.category}, Правильные: ${stat.correct_answers}, Неправильные: ${stat.incorrect_answers}`;
+                    statsDiv.appendChild(statItem);
+                });
+            } else {
+                alert('Ошибка при получении статистики');
+            }
+        }
+
+        async function submitAnswer() {
+            const userId = document.getElementById('submit_user_id').value;
+            const questionId = document.getElementById('question_id').value;
+            const userAnswer = document.getElementById('user_answer').value;
+
+            const response = await fetch('/api/submit_answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId, question_id: questionId, user_answer: userAnswer })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.correct ? 'Правильный ответ!' : 'Неправильный ответ.');
+            } else {
+                alert('Ошибка при отправке ответа');
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -32,6 +93,28 @@
                 <button onclick="window.open('/api/new_question/math', '_blank')">Математика</button>
             </div>
         </div>
+
+        <div class="registration">
+            <h2>Регистрация пользователя</h2>
+            <input type="text" id="nickname" placeholder="Введите ник" required>
+            <button onclick="registerUser()">Зарегистрироваться</button>
+        </div>
+
+        <div class="statistics">
+            <h2>Статистика пользователя</h2>
+            <input type="number" id="user_id" placeholder="Введите ID пользователя" required>
+            <button onclick="getUserStatistics()">Получить статистику</button>
+            <div id="user_statistics"></div>
+        </div>
+
+        <div class="submit-answer">
+            <h2>Отправить ответ</h2>
+            <input type="number" id="submit_user_id" placeholder="Введите ID пользователя" required>
+            <input type="number" id="question_id" placeholder="Введите ID вопроса" required>
+            <input type="text" id="user_answer" placeholder="Ваш ответ" required>
+            <button onclick="submitAnswer()">Отправить ответ</button>
+        </div>
+
         <footer>
             <p>Все права защищены? &copy; 2024</p>
         </footer>

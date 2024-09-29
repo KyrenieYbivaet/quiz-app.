@@ -1,20 +1,20 @@
 import React from 'react'
-import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
-const HeaderContainer = styled.header`
-    background-color: #282c34;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-`
-
-const Header = () => {
+const Header = ({ isAuthenticated, onLogout }) => {
     return (
-        <HeaderContainer>
-            <h1>Quiz App</h1>
-        </HeaderContainer>
+        <header className='header'>
+            <div className='logo'>QuizApp</div>
+            <div className='auth-buttons'>
+                {isAuthenticated ? (
+                    <>
+                        <span>Имя пользователя</span>
+                        <button onClick={onLogout}>Выход</button>
+                    </>
+                ) : null}{' '}
+                {/* Здесь ничего не отображаем, если не авторизован */}
+            </div>
+        </header>
     )
 }
 

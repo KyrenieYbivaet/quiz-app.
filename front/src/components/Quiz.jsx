@@ -1,119 +1,47 @@
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import Question from './Question'
 
-const QuizContainer = styled.div`
-    padding: 20px;
-    text-align: center;
-`
-
-const Question = styled.h2`
-    margin-bottom: 20px;
-`
-
-const AnswerButton = styled.button`
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: #e0e0e0;
-    }
-`
-
-const NextButton = styled.button`
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: #0056b3;
-    }
-`
-
-const Quiz = ({ onBack }) => {
+function Quiz({ user, setHistory }) {
+    const { topic } = useParams()
     const [questions, setQuestions] = useState([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-    const [selectedAnswer, setSelectedAnswer] = useState(null)
     const [score, setScore] = useState(0)
-    const [isQuizCompleted, setIsQuizCompleted] = useState(false)
+    const [completed, setCompleted] = useState(false)
 
     useEffect(() => {
-        fetch('/questions.json')
-            .then(response => response.json())
-            .then(data => {
-                setQuestions(data)
-            })
-    }, [])
+        // Загрузка вопросов (пример вопросов)
+        setQuestions([
+            {
+                question: 'What is the capital of France?',
+                options: ['Paris', 'London', 'Berlin', 'Madrid'],
+                correct: 0,
+            },
+            // Еще 4 вопроса
+        ])
+    }, [topic])
 
-    const handleAnswerClick = answer => {
-        setSelectedAnswer(answer)
-    }
-
-    const handleNextQuestion = () => {
-        const currentQuestion = questions[currentQuestionIndex]
-
-        if (selectedAnswer === currentQuestion.correctAnswer) {
-            setScore(score + 1)
-        }
-
-        const nextIndex = currentQuestionIndex + 1
-        if (nextIndex < questions.length) {
-            setCurrentQuestionIndex(nextIndex)
-            setSelectedAnswer(null)
+    const handleAnswer = isCorrect => {
+        if (isCorrect) setScore(score + 1)
+        if (currentQuestionIndex + 1 === questions.length) {
+            setCompleted(true)
+            setHistory(prev => [...prev, { topic, score }])
         } else {
-            setIsQuizCompleted(true)
+            setCurrentQuestionIndex(currentQuestionIndex + 1)
         }
     }
 
-    if (questions.length === 0) {
-        return <p>Загрузка вопросов...</p>
+    if (completed) {
+        return <div>Тест завершен. Ваш результат: {score} / 5</div>
     }
-
-    if (isQuizCompleted) {
-        return (
-            <QuizContainer>
-                <h2>Викторина завершена!</h2>
-                <p>
-                    Ваш результат: {score} из {questions.length}
-                </p>
-                <NextButton onClick={onBack}>Назад к тематикам</NextButton>
-            </QuizContainer>
-        )
-    }
-
-    const currentQuestion = questions[currentQuestionIndex]
 
     return (
-        <QuizContainer>
-            <Question>{currentQuestion.question}</Question>
-            {currentQuestion.answers.map((answer, index) => (
-                <AnswerButton
-                    key={index}
-                    onClick={() => handleAnswerClick(answer)}
-                    style={{
-                        backgroundColor:
-                            selectedAnswer === answer ? '#d3d3d3' : '#f0f0f0',
-                    }}
-                >
-                    {answer}
-                </AnswerButton>
-            ))}
-            {selectedAnswer && (
-                <NextButton onClick={handleNextQuestion}>
-                    {currentQuestionIndex + 1 === questions.length
-                        ? 'Завершить'
-                        : 'Следующий вопрос'}
-                </NextButton>
-            )}
-        </QuizContainer>
+        <div>
+            <Question
+                data={questions[currentQuestionIndex]}
+                onAnswer={handleAnswer}
+            />
+        </div>
     )
 }
 

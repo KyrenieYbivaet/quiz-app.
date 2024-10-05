@@ -1,42 +1,180 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Общие стили для всего приложения */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  /* Светлый фон для приложения */
+}
+
+/* Шапка приложения */
+.header {
+  background-color: #007bff;
+  /* Цвет фона шапки */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  /* Отображаем логотип и кнопки по краям */
+  align-items: center;
+  padding: 10px 20px;
+}
+
+/* Логотип */
+.header .logo {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+/* Кнопки Входа и Регистрации */
+.header .auth-buttons {
+  display: flex;
+  gap: 15px;
+  /* Отступы между кнопками */
+}
+
+/* Стили для ссылок */
+.header a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.header a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  /* Эффект при наведении */
+}
+
+/* Стили для основной страницы */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  /* Минимальная высота содержимого */
+}
+
+/* Выбор тематики теста */
+.theme-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Отступы между кнопками тем */
+}
+
+/* Кнопки тем */
+.theme-selection button {
+  padding: 15px;
+  width: 200px;
+  /* Фиксированная ширина для кнопок тем */
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  /* Зеленый фон для кнопок */
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.theme-selection button:hover {
+  background-color: #218838;
+  /* Темно-зеленый при наведении */
+}
+
+/* Стили для страницы истории */
+.history-page {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.history-page h2 {
+  margin: 20px 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Модальное окно - фон */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  /* Полупрозрачный фон */
+  display: flex;
+  justify-content: center;
+  /* Центрируем содержимое по горизонтали */
+  align-items: center;
+  /* Центрируем содержимое по вертикали */
+}
+
+/* Содержимое модального окна */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  /* Вертикальное расположение элементов */
+  align-items: center;
+  /* Центрируем содержимое по горизонтали */
+  gap: 15px;
+  /* Отступы между элементами */
+}
+
+/* Заголовок модального окна */
+.modal-content h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Поля ввода */
+input {
+  width: 100%;
+  /* Поля ввода занимают всю ширину контейнера */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  /* Отступ снизу */
+  font-size: 16px;
+  /* Увеличиваем шрифт для удобства */
+}
+
+/* Кнопки (например, "Войти" или "Зарегистрироваться") */
+button {
+  padding: 10px;
+  width: 100%;
+  /* Кнопки занимают всю ширину контейнера */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  /* Цвет кнопок */
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  /* Увеличиваем шрифт кнопок */
+  transition: background-color 0.3s ease;
+}
+
+/* Стили для кнопки при наведении */
+button:hover {
+  background-color: #0056b3;
+  /* Темный цвет при наведении */
+}
+
+button+button {
+  background-color: #827474;
+}
+
+button+button:hover {
+  background-color: #999;
+}
+
+@media (max-width: 400px) {
+  .modal-content {
+    width: 90%;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
